@@ -1,4 +1,4 @@
-let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime;
+let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime, controls, sceneObjects;
 var mixers = [];
 
 
@@ -10,21 +10,26 @@ function init() {
     let container = document.getElementById('container');
 
     camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 6000 );
-    camera.position.set( 0, 0, 1500 );
+    camera.position.set( 0, 0, 2000 );
     
-    let controls = new THREE.OrbitControls(camera);
+    controls = new THREE.OrbitControls(camera);
     //controls.maxPolarAngle = Math.PI / 2;
-    controls.minDistance = 200;
-    controls.maxDistance = 3000;
-    controls.target.set(0,30,0);
+    controls.minDistance = 1500;
+    controls.maxDistance = 2000;
+    controls.minPolarAngle = Math.PI/2;
+    controls.maxPolarAngle = Math.PI/2;
+    
+    controls.enablePan = false;
+    
+    controls.target.set(0,0,-00);
     controls.update();
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color().setHSL( 0.6, 0.6, 1 );
+    scene.background = new THREE.Color(0.4,0.4,0.4);
     
     lights = new Lighting(scene);
     
-    let sceneObjects = new SceneObjects(scene);
+    sceneObjects = new SceneObjects(scene);
     
     // RENDERER
     renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -70,5 +75,7 @@ function render() {
     for ( var i = 0; i < mixers.length; i ++ ) {
         mixers[ i ].update( delta );
     }
+    sceneObjects.rotor.rotation.x += 0.05;
     renderer.render( scene, camera );
 }
+
