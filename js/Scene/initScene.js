@@ -1,4 +1,4 @@
-let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime, controls, sceneObjects;
+let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime, controls, sceneObjects, modifier;
 var mixers = [];
 
 
@@ -28,6 +28,10 @@ function init() {
     scene.background = new THREE.Color(0.4,0.4,0.4);
     
     lights = new Lighting(scene);
+    
+    modifier = new THREE.SimplifyModifier();
+    /*let count = Math.floor( cube.geometry.attributes.position.count * 0.12 ); // number of vertices to remove
+    cube.geometry = modifier.modify( cube.geometry, count );*/
     
     sceneObjects = new SceneObjects(scene);
     
@@ -75,7 +79,9 @@ function render() {
     for ( var i = 0; i < mixers.length; i ++ ) {
         mixers[ i ].update( delta );
     }
-    sceneObjects.rotor.rotation.x += 0.05;
+    if(sceneObjects.object_ready){
+       sceneObjects.rotor.rotation.x += 0.05;
+    }
     renderer.render( scene, camera );
 }
 

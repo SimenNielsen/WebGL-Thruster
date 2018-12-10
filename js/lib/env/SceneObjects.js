@@ -17,17 +17,20 @@ class SceneObjects{
         .load( object_info.MTL_file, function ( materials ) {
 
             materials.preload();
-
+            
             new THREE.OBJLoader()
                 .setMaterials( materials )
                 .setPath(object_info.OBJ_path)
                 .load(object_info.OBJ_file, function ( object ) {
                     object.traverse( function ( child ) {
                         if ( child instanceof THREE.Mesh ) {
-                            console.log(child.name)
+                            console.log(child.name);
+                            let count = Math.floor( child.geometry.attributes.position.count * 0.1 ); // number of vertices to remove
+                            child.geometry = modifier.modify( child.geometry, count );
+                            child.material = new THREE.MeshPhongMaterial({flatShading:true});
                             if(child.name === "Part__Feature182"){
                                 console.log("child found");
-                                child.material = new THREE.MeshPhongMaterial({color: 0xffff00, wireframe:true});
+                                child.material.color = new THREE.Color(0xffff00);
                                 child.geometry.center();
                                 child.scale.set(0.95,0.95,0.95);
                                 child.position.z = -1100;
@@ -35,8 +38,6 @@ class SceneObjects{
                                 this.rotor = child;
                                 return;
                             }
-                            child.material.color = new THREE.Color(0xaaaaaa);
-                            child.material.wireframe = true;
                         }   
                     }.bind(this));
                     this.add_obj_to_scene(object)
@@ -53,5 +54,6 @@ class SceneObjects{
         object.rotation.x = -Math.PI / 2;
         object.rotation.z = -Math.PI / 2;;
         object.scale.set(0.6,0.6,0.6);
+        this.object_ready = true;
     }
 }
