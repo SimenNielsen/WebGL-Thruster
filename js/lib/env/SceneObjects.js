@@ -8,6 +8,7 @@ class SceneObjects{
                       };
         this.load_object(this.thruster);
         this.callback = callback;
+        this.parts = [];
     }
     
 
@@ -25,9 +26,8 @@ class SceneObjects{
                     object.traverse( function ( child ) {
                         if ( child instanceof THREE.Mesh ) {
                             console.log(child.name);
-                            let count = Math.floor( child.geometry.attributes.position.count * 0.1 ); // number of vertices to remove
-                            child.geometry = modifier.modify( child.geometry, count );
                             child.material = new THREE.MeshPhongMaterial({flatShading:true});
+                            this.parts.push(child);
                             if(child.name === "Part__Feature182"){
                                 console.log("child found");
                                 child.material.color = new THREE.Color(0xffff00);

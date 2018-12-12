@@ -1,4 +1,4 @@
-let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime, controls, sceneObjects, modifier;
+let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime, controls, sceneObjects, modifier, effectController;
 var mixers = [];
 
 
@@ -11,18 +11,6 @@ function init() {
 
     camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 6000 );
     camera.position.set( 0, 0, 2000 );
-    
-    controls = new THREE.OrbitControls(camera);
-    //controls.maxPolarAngle = Math.PI / 2;
-    controls.minDistance = 1500;
-    controls.maxDistance = 2000;
-    controls.minPolarAngle = Math.PI/2;
-    controls.maxPolarAngle = Math.PI/2;
-    
-    controls.enablePan = false;
-    
-    controls.target.set(0,0,-00);
-    controls.update();
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0.4,0.4,0.4);
@@ -34,6 +22,27 @@ function init() {
     cube.geometry = modifier.modify( cube.geometry, count );*/
     
     sceneObjects = new SceneObjects(scene);
+    
+    var gui = new dat.GUI();
+
+    effectController  = {
+        vertex_modifier: 0,
+        thruster_speed: 0.05,
+        rotate_thruster: ! true
+    };
+    function guiChanged() {
+        sceneObjects.thrusterobj.traverse( function ( child ) {
+            if ( child instanceof THREE.Mesh ) {
+                    let count = Math.floor( child.geometry.attributes.position.count * effectController.vertex_modifier ); // number of vertices to remove
+                    child.geometry = modifier.modify( child.geometry, count );
+                }
+            });
+    }
+    
+    gui.add( effectController, "vertex_modifier", 0.0, 0.16, 0.01 ).onChange( guiChanged );
+    gui.add( effectController, "thruster_speed", 0.0, 2.0, 0.01 );
+    gui.add( effectController, "rotate_thruster" );
+				
     
     // RENDERER
     renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -47,6 +56,18 @@ function init() {
     //
     window.addEventListener( 'resize', onWindowResize, false );
     document.addEventListener( 'keydown', onKeyDown, false );
+    
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    //controls.maxPolarAngle = Math.PI / 2;
+    controls.minDistance = 1500;
+    controls.maxDistance = 2000;
+    controls.minPolarAngle = Math.PI/2;
+    controls.maxPolarAngle = Math.PI/2;
+    
+    controls.enablePan = false;
+    
+    controls.target.set(0,0,-00);
+    controls.update();
     
     animate();
 }
@@ -79,8 +100,8 @@ function render() {
     for ( var i = 0; i < mixers.length; i ++ ) {
         mixers[ i ].update( delta );
     }
-    if(sceneObjects.object_ready){
-       sceneObjects.rotor.rotation.x += 0.05;
+    if(sceneObjects.object_ready && effectController.rotate_thruster){
+       sceneObjects.rotor.rotation.x += effectController.thruster_speed;
     }
     renderer.render( scene, camera );
 }
