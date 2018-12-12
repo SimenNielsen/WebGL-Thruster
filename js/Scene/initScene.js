@@ -1,4 +1,4 @@
-let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime, controls, sceneObjects, modifier, effectController;
+let camera, scene, renderer, water, fog, audio, lights, sky, sunSphere, timeDiff, fastTimeDiff, autoTime, controls, sceneObjects, modifier, effectController, stats;
 var mixers = [];
 
 
@@ -69,6 +69,14 @@ function init() {
     controls.target.set(0,0,-00);
     controls.update();
     
+    var updateFcts	= [];
+    
+    stats	= new Stats();
+	stats.domElement.style.position	= 'absolute'
+	stats.domElement.style.right	= '0px'
+	stats.domElement.style.bottom	= '0px'
+	document.body.appendChild( stats.domElement )
+    
     animate();
 }
 function onWindowResize() {
@@ -95,7 +103,8 @@ function animate() {
     render();
 }
 let count = 0;
-function render() {
+var lastTimeMsec= null
+function render(nowMsec) {
     var delta = clock.getDelta();
     for ( var i = 0; i < mixers.length; i ++ ) {
         mixers[ i ].update( delta );
@@ -103,6 +112,10 @@ function render() {
     if(sceneObjects.object_ready && effectController.rotate_thruster){
        sceneObjects.rotor.rotation.x += effectController.thruster_speed;
     }
+    lastTimeMsec = lastTimeMsec || nowMsec-1000/60;
+    var deltaMsec = Math.min(200, nowMsec - lastTimeMsec);
+    lastTimeMsec = nowMsec;
+    stats.update(deltaMsec/1000, nowMsec/1000)
     renderer.render( scene, camera );
 }
 
