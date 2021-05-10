@@ -1,2 +1,2 @@
-# thruster
-thruster demo
+# WebGL 3D Thruster
+Experimental project
